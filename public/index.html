@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f7fb" />
+    <title>API — Control Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <svg class="svg-sprite" aria-hidden="true">
+      <symbol id="i-api" viewBox="0 0 24 24"><path d="M8 9 4 12l4 3M16 9l4 3-4 3M14 5l-4 14"/></symbol>
+      <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+      <symbol id="i-box" viewBox="0 0 24 24"><path d="m4 7 8-4 8 4-8 4-8-4Z"/><path d="m4 7 8 4 8-4v10l-8 4-8-4V7Z"/><path d="M12 11v10"/></symbol>
+      <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M16 7l3 3M14 9l2 2"/></symbol>
+      <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v7c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12v7c0 1.7 3.6 3 8 3s8-1.3 8-3v-7"/></symbol>
+      <symbol id="i-logout" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3M14 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+      <symbol id="i-activity" viewBox="0 0 24 24"><path d="M3 12h4l2-7 4 14 2-7h6"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="i-server" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/><path d="M7 7h.01M7 17h.01M11 7h7M11 17h7"/></symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></symbol>
+      <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 9-4 3 4 3M16 9l4 3-4 3M14 5l-4 14"/></symbol>
+      <symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h3a3 3 0 0 0 3-3V8a3 3 0 0 1 3-3h-1"/></symbol>
+      <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+      <symbol id="i-log" viewBox="0 0 24 24"><path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h5"/></symbol>
+    </svg>
+    <div class="noise"></div>
+    <div class="orb orb-one"></div>
+    <div class="orb orb-two"></div>
+
+    <main>
+      <section id="login-view" class="login-shell">
+        <div class="brand-panel">
+          <div class="logo"><span><svg><use href="#i-api"/></svg></span><div>API<small>CONTROL CENTER</small></div></div>
+          <div class="hero-copy">
+            <p class="eyebrow">LICENSING, SIMPLIFIED</p>
+            <h1>Controle suas keys.<br /><em>Domine seu produto.</em></h1>
+            <p class="subtitle">Gerencie produtos, emissoes e ativacoes em uma experiencia rapida e segura.</p>
+            <div class="stats">
+              <div><strong>Postgres</strong><span>Persistencia cloud</span></div>
+              <div><strong>REST</strong><span>Pronto para C++</span></div>
+              <div><strong>24/7</strong><span>Bot integrado</span></div>
+            </div>
+          </div>
+          <div class="signal-card">
+            <span class="pulse"></span>
+            <div><strong>Sistema operacional</strong><small>API aguardando conexoes</small></div>
+          </div>
+        </div>
+
+        <div class="login-panel">
+          <form id="login-form" class="login-card">
+            <p class="eyebrow">AREA RESTRITA</p>
+            <h2>Bem-vindo de volta</h2>
+            <p class="muted">Entre para acessar o painel administrativo.</p>
+            <label>Usuario<input id="username" autocomplete="username" placeholder="Seu usuario" required /></label>
+            <label>Senha<div class="password-field"><input id="password" type="password" autocomplete="current-password" placeholder="Sua senha" required /><button id="show-password" type="button" aria-label="Mostrar senha">◉</button></div></label>
+            <p id="login-error" class="error" role="alert"></p>
+            <button class="primary" type="submit"><span>Entrar no painel</span><b>→</b></button>
+            <small class="credentials">Acessos sao criados com seguranca pelo comando <code>/gerarusuario</code> no Discord.</small>
+          </form>
+        </div>
+      </section>
+
+      <section id="dashboard-view" class="dashboard hidden">
+        <aside>
+          <div class="logo"><span><svg><use href="#i-api"/></svg></span><div>API<small>CONTROL CENTER</small></div></div>
+          <nav>
+            <p class="nav-label">PRINCIPAL</p>
+            <button class="nav-item active" data-target="overview"><b><svg><use href="#i-grid"/></svg></b><span>Dashboard</span></button>
+            <button class="nav-item" data-target="generate-keys"><b><svg><use href="#i-plus"/></svg></b><span>Gerar keys</span></button>
+            <button class="nav-item" data-target="licenses"><b><svg><use href="#i-key"/></svg></b><span>Licencas</span></button>
+            <button class="nav-item" data-target="products"><b><svg><use href="#i-box"/></svg></b><span>Produtos</span></button>
+            <p class="nav-label nav-label-spaced">USUARIOS</p>
+            <button class="nav-item" data-target="users"><b><svg><use href="#i-users"/></svg></b><span>Usuarios</span></button>
+            <button class="nav-item" data-target="create-user"><b><svg><use href="#i-plus"/></svg></b><span>Criar usuario</span></button>
+            <p class="nav-label nav-label-spaced">SISTEMA</p>
+            <button class="nav-item" data-target="logs"><b><svg><use href="#i-log"/></svg></b><span>Logs</span></button>
+            <button class="nav-item" data-target="database"><b><svg><use href="#i-database"/></svg></b><span>Database</span></button>
+          </nav>
+          <div class="sidebar-footer">
+            <div class="aside-status"><i></i><div><strong>Sistema online</strong><small>Todos os servicos</small></div></div>
+            <button id="logout" class="logout"><svg><use href="#i-logout"/></svg><span>Encerrar sessao</span></button>
+          </div>
+        </aside>
+
+        <div class="content">
+          <header>
+            <div><p class="breadcrumb">API <span>/</span> Painel administrativo</p><h2 id="page-title">Visao geral</h2></div>
+            <div class="header-actions"><button id="theme-toggle" class="icon-button" type="button" aria-label="Alternar tema">◐</button><div class="system-pill"><i></i><span>API operacional</span></div><div class="avatar">A</div></div>
+          </header>
+
+          <section id="overview" class="page active-page">
+            <article class="overview-banner">
+              <div>
+                <span class="live-badge"><i></i> SISTEMA OPERACIONAL</span>
+                <h3>Central de controle da API</h3>
+                <p>Gerencie licencas, produtos, usuarios e integracoes em um unico ambiente seguro.</p>
+              </div>
+              <div class="banner-meta"><small>AMBIENTE</small><strong id="api-environment">PRODUCTION</strong><small>ENDPOINT PRINCIPAL</small><code id="api-base-url">/api</code></div>
+            </article>
+            <div class="metric-grid">
+              <article><div class="metric-top"><span>Keys emitidas</span><i><svg><use href="#i-key"/></svg></i></div><strong id="total-keys">0</strong><small>Total acumulado</small></article>
+              <article><div class="metric-top"><span>Keys ativas</span><i><svg><use href="#i-check"/></svg></i></div><strong id="active-keys">0</strong><small>Licencas validas</small></article>
+              <article><div class="metric-top"><span>Ativacoes</span><i><svg><use href="#i-activity"/></svg></i></div><strong id="total-activations">0</strong><small>Dispositivos conectados</small></article>
+              <article class="accent-card"><div class="metric-top"><span>Produtos</span><i><svg><use href="#i-box"/></svg></i></div><strong id="total-products">0</strong><small>Disponiveis agora</small></article>
+              <article><div class="metric-top"><span>Criadas hoje</span><i><svg><use href="#i-plus"/></svg></i></div><strong id="keys-today">0</strong><small>Desde 00:00</small></article>
+              <article><div class="metric-top"><span>Keys utilizadas</span><i><svg><use href="#i-check"/></svg></i></div><strong id="used-keys">0</strong><small>Com ativacao</small></article>
+              <article><div class="metric-top"><span>Expiradas</span><i><svg><use href="#i-activity"/></svg></i></div><strong id="expired-keys">0</strong><small>Fora da validade</small></article>
+              <article><div class="metric-top"><span>Bloqueadas</span><i><svg><use href="#i-shield"/></svg></i></div><strong id="blocked-keys">0</strong><small>Acesso suspenso</small></article>
+            </div>
+            <div class="analytics-grid"><article class="panel"><div class="panel-head"><div><p class="eyebrow">ULTIMOS 7 DIAS</p><h3>Keys criadas por dia</h3></div></div><div id="creation-chart" class="bar-chart"></div></article><article class="panel"><div class="panel-head"><div><p class="eyebrow">DISTRIBUICAO</p><h3>Status das keys</h3></div></div><div id="status-chart" class="status-chart"></div></article></div>
+            <div class="dashboard-activity-grid">
+              <article class="panel">
+                <div class="panel-head"><div><p class="eyebrow">ULTIMAS EMISSOES</p><h3>Atividade recente</h3></div><button class="text-button" data-go="licenses">Ver todas</button></div>
+                <div id="recent-list" class="activity-list"></div>
+              </article>
+            </div>
+            <div class="info-grid">
+              <article class="info-card">
+                <span class="info-icon"><svg><use href="#i-route"/></svg></span>
+                <div><p class="eyebrow">ROTAS PRINCIPAIS</p><h4>Endpoints disponiveis</h4><ul><li><code>POST /api/client/secure-query</code><span>Consulta AES-256-GCM</span></li><li><code>POST /api/client/query</code><span>Validar licenca C++</span></li><li><code>POST /api/keys/batch</code><span>Gerar ate 5.000 keys</span></li><li><code>GET /api/health</code><span>Saude dos servicos</span></li></ul></div>
+              </article>
+              <article class="info-card">
+                <span class="info-icon"><svg><use href="#i-shield"/></svg></span>
+                <div><p class="eyebrow">SEGURANCA</p><h4>Protecao integrada</h4><ul class="check-list"><li>Envelope AES-256-GCM autenticado</li><li>Senhas protegidas com scrypt</li><li>Sessoes por token com expiracao</li><li>HWIDs armazenados como hash</li><li>Supabase e Render usando TLS</li></ul></div>
+              </article>
+              <article class="info-card code-card">
+                <span class="info-icon"><svg><use href="#i-code"/></svg></span>
+                <div><p class="eyebrow">CLIENTE C++</p><h4>Consulta segura</h4><pre><code>POST /api/client/secure-query
+{
+  "version": 1,
+  "iv": "base64",
+  "tag": "base64",
+  "data": "base64"
+}</code></pre></div>
+              </article>
+            </div>
+          </section>
+
+          <section id="generate-keys" class="page">
+            <div class="section-copy"><p class="eyebrow">EMISSAO</p><h3>Gerar keys</h3><p class="muted">Crie uma key ou um lote com ate 5.000 licencas e acompanhe o progresso.</p></div>
+            <article class="panel generate-panel standalone-panel">
+              <div class="panel-head"><div><p class="eyebrow">NOVA EMISSAO</p><h3>Configurar lote</h3></div><span class="icon-chip"><svg><use href="#i-plus"/></svg></span></div>
+              <form id="key-form">
+                <label>Produto<select id="key-product" required></select></label>
+                <div class="form-row batch-fields">
+                  <label>Validade (dias)<input id="key-days" type="number" min="1" max="3650" value="30" required /></label>
+                  <label>Dispositivos<input id="key-activations" type="number" min="1" max="100" value="1" required /></label>
+                  <label>Quantidade<input id="key-quantity" type="number" min="1" max="5000" value="1" required /><small class="field-help">Ate 5.000 por lote</small></label>
+                </div>
+                <button class="primary" type="submit"><span>Gerar keys seguras</span><b>→</b></button>
+              </form>
+              <div id="generated-key" class="generated hidden"><small>KEYS CRIADAS</small><pre></pre><div class="generated-actions"><button id="copy-generated-keys" type="button">Copiar todas</button><button id="download-generated-keys" type="button">Baixar .txt</button></div></div>
+              <div id="generation-progress" class="job-progress hidden"><div><span id="job-status">Preparando...</span><strong id="job-percent">0%</strong></div><progress id="job-progress-bar" max="100" value="0"></progress><div class="job-counters"><span><b id="job-created">0</b> criadas</span><span><b id="job-pending">0</b> pendentes</span><span><b id="job-errors">0</b> erros</span></div></div>
+            </article>
+          </section>
+
+          <section id="products" class="page">
+            <div class="section-copy"><p class="eyebrow">CATALOGO</p><h3>Produtos disponiveis</h3><p class="muted">Use o ID do produto para validar uma key no cliente C++.</p></div>
+            <div class="context-banner"><span><svg><use href="#i-server"/></svg></span><div><strong>Catalogo conectado a API</strong><p>Cada produto possui um identificador unico usado nas rotas de validacao, resgate e consulta do cliente.</p></div><code>GET /api/products</code></div>
+            <div id="product-grid" class="product-grid"></div>
+          </section>
+
+          <section id="licenses" class="page">
+            <div class="section-heading-row">
+              <div class="section-copy"><p class="eyebrow">GERENCIAMENTO</p><h3>Todas as licencas</h3><p class="muted">Pesquise, filtre e altere o estado das keys emitidas.</p></div>
+              <div class="filter-bar"><input id="key-search" type="search" placeholder="Pesquisar key ou produto..." /><select id="key-status-filter"><option value="all">Todos os status</option><option value="active">Ativas</option><option value="used">Utilizadas</option><option value="blocked">Bloqueadas</option><option value="revoked">Revogadas</option><option value="expired">Expiradas</option></select><button id="export-csv" class="secondary-button" type="button">CSV</button><button id="export-json" class="secondary-button" type="button">JSON</button></div>
+            </div>
+            <div class="bulk-selection"><strong><span id="selected-count">0</span> selecionadas</strong><select id="selection-action"><option value="blocked">Bloquear</option><option value="active">Desbloquear</option><option value="revoked">Revogar</option><option value="delete">Excluir</option></select><button id="apply-selection" class="secondary-button" type="button">Aplicar em massa</button></div>
+            <article class="admin-toolbox">
+              <div class="toolbox-copy"><span class="danger-icon">!</span><div><p class="eyebrow">OPERACAO EM LOTE</p><h4>Excluir varias keys</h4><p>Escolha exatamente quais registros devem ser removidos. As ativacoes relacionadas tambem serao apagadas.</p></div></div>
+              <div class="toolbox-grid">
+                <label>Quantidade<input id="bulk-delete-quantity" type="number" min="1" max="5000" value="1" /></label>
+                <label>Produto<select id="bulk-delete-product"><option value="all">Todos os produtos</option></select></label>
+                <label>Status<select id="bulk-delete-status"><option value="all">Todos</option><option value="active">Ativas</option><option value="used">Utilizadas</option><option value="blocked">Bloqueadas</option><option value="revoked">Revogadas</option></select></label>
+                <label>Prioridade<select id="bulk-delete-order"><option value="newest">Mais recentes</option><option value="oldest">Mais antigas</option></select></label>
+                <button id="bulk-delete-keys" class="danger-button" type="button">Excluir selecionadas</button>
+              </div>
+            </article>
+            <div class="license-summary"><article><span>Total</span><strong id="license-total">0</strong></article><article><span>Ativas</span><strong id="license-active">0</strong></article><article><span>Bloqueadas</span><strong id="license-disabled">0</strong></article><article><span>Expiradas</span><strong id="license-expired">0</strong></article></div>
+            <div class="table-wrap"><table><thead><tr><th><input id="select-page-keys" type="checkbox" aria-label="Selecionar pagina" /></th><th>Key</th><th>Produto</th><th>Status</th><th>Ativacoes</th><th>Expira</th><th></th></tr></thead><tbody id="keys-table"></tbody></table></div>
+            <div class="pagination"><span id="keys-page-info">0 resultados</span><div><button id="keys-prev" type="button">← Anterior</button><button id="keys-next" type="button">Proxima →</button></div></div>
+          </section>
+
+          <section id="users" class="page">
+            <div class="section-heading-row"><div class="section-copy"><p class="eyebrow">CONTAS E PERMISSOES</p><h3>Usuarios</h3><p class="muted">Pesquise contas, altere permissoes, redefina senhas e encerre sessoes.</p></div><button class="secondary-button" type="button" data-go="create-user">+ Criar usuario</button></div>
+            <article class="panel standalone-panel">
+              <div class="panel-head"><div><p class="eyebrow">ACESSOS</p><h3>Usuarios cadastrados <span id="users-count" class="count-badge">0</span></h3></div></div>
+              <div class="filter-bar user-filters"><input id="user-search" type="search" placeholder="Pesquisar usuario..." /><select id="user-role-filter"><option value="all">Todas as permissoes</option><option value="superadmin">Superadmins</option><option value="admin">Administradores</option><option value="operator">Operadores</option><option value="support">Suporte</option><option value="viewer">Visualizadores</option><option value="customer">Clientes</option></select></div>
+              <div class="table-wrap users-table-wrap"><table><thead><tr><th>Usuario</th><th>Permissao</th><th>Criado</th><th>Acoes</th></tr></thead><tbody id="users-table"></tbody></table></div>
+            </article>
+          </section>
+
+          <section id="create-user" class="page">
+            <div class="section-copy"><p class="eyebrow">NOVO ACESSO</p><h3>Criar usuario</h3><p class="muted">Cadastre uma conta e escolha exatamente o nivel de permissao.</p></div>
+            <div class="create-user-layout">
+              <article class="panel standalone-panel">
+                <div class="panel-head"><div><p class="eyebrow">DADOS DA CONTA</p><h3>Novo usuario</h3></div><span class="icon-chip"><svg><use href="#i-plus"/></svg></span></div>
+                <form id="user-form">
+                  <label>Usuario<input id="new-username" minlength="3" maxlength="50" placeholder="nome.usuario" required /></label>
+                  <label>Senha<input id="new-password" type="password" minlength="6" maxlength="128" placeholder="Minimo de 6 caracteres" required /></label>
+                  <label>Permissao<select id="new-role"><option value="viewer">Visualizador</option><option value="support">Suporte</option><option value="operator">Operador</option><option value="admin">Administrador</option><option value="superadmin">Superadministrador</option></select></label>
+                  <button class="primary" type="submit"><span>Criar usuario</span><b>→</b></button>
+                </form>
+              </article>
+              <article class="panel permission-guide"><p class="eyebrow">NIVEIS DE ACESSO</p><h3>Permissoes</h3><ul><li><strong>Visualizador</strong><span>Consulta dados sem alterar registros.</span></li><li><strong>Suporte</strong><span>Consulta e bloqueia keys.</span></li><li><strong>Operador</strong><span>Cria e gerencia emissoes.</span></li><li><strong>Administrador</strong><span>Gerencia keys e usuarios.</span></li><li><strong>Superadministrador</strong><span>Acesso a operacoes criticas.</span></li></ul></article>
+            </div>
+          </section>
+
+          <section id="logs" class="page">
+            <div class="section-heading-row"><div class="section-copy"><p class="eyebrow">AUDITORIA E DEBUG</p><h3>Logs do sistema</h3><p class="muted">Acompanhe eventos administrativos, seguranca e operacoes de keys.</p></div><button id="refresh-logs" class="secondary-button" type="button">↻ Atualizar logs</button></div>
+            <div class="logs-layout">
+              <article class="panel"><div class="panel-head"><div><p class="eyebrow">TEMPO REAL</p><h3>Console de operacao</h3></div></div><div class="debug-console"><div><strong>Eventos desta sessao</strong><button id="clear-console" type="button">Limpar</button></div><pre id="operation-console">[INFO] Console pronto.</pre></div></article>
+              <article class="panel"><div class="panel-head"><div><p class="eyebrow">LEGENDA</p><h3>Niveis de log</h3></div></div><div class="log-legend"><span class="log-level level-info">INFO</span><span class="log-level level-success">SUCCESS</span><span class="log-level level-warning">WARNING</span><span class="log-level level-error">ERROR</span><span class="log-level level-debug">DEBUG</span></div></article>
+            </div>
+            <div class="section-heading-row db-keys-title"><div class="section-copy"><p class="eyebrow">HISTORICO</p><h3>Ultimas operacoes</h3><p class="muted">Registro de auditoria das acoes executadas no painel.</p></div></div>
+            <div class="table-wrap"><table><thead><tr><th>Nivel</th><th>Operacao</th><th>Entidade</th><th>Responsavel</th><th>Data</th></tr></thead><tbody id="audit-table"></tbody></table></div>
+          </section>
+
+          <section id="database" class="page">
+            <div class="section-heading-row"><div class="section-copy"><p class="eyebrow">SUPABASE POSTGRES</p><h3>Database</h3><p class="muted">Monitore a conexao, tabelas e os registros de licencas armazenados.</p></div><button id="refresh-database" class="secondary-button" type="button">↻ Atualizar dados</button></div>
+            <div class="database-status panel">
+              <div><span class="db-indicator"></span><div><strong id="db-status-label">Verificando...</strong><small id="db-host">Supabase</small></div></div>
+              <div><small>LATENCIA</small><strong id="db-latency">-- ms</strong></div>
+              <div><small>DATABASE</small><strong id="db-name">postgres</strong></div>
+              <div><small>CONEXAO</small><strong id="db-ssl">SSL</strong></div>
+            </div>
+            <div id="db-table-grid" class="db-table-grid"></div>
+            <div class="section-heading-row db-keys-title"><div class="section-copy"><p class="eyebrow">TABELA DE LICENCAS</p><h3>Keys armazenadas</h3></div><div class="filter-bar"><input id="db-key-search" type="search" placeholder="Localizar key..." /></div></div>
+            <div class="table-wrap"><table><thead><tr><th>Key</th><th>Produto</th><th>Status</th><th>Ativacoes</th><th>Criada</th><th>Expira</th></tr></thead><tbody id="db-keys-table"></tbody></table></div>
+            <div class="pagination"><span id="db-keys-page-info">0 resultados</span><div><button id="db-keys-prev" type="button">← Anterior</button><button id="db-keys-next" type="button">Proxima →</button></div></div>
+          </section>
+        </div>
+      </section>
+    </main>
+    <div id="toast" class="toast"></div>
+    <script src="/app.js" defer></script>
+  </body>
+</html>
