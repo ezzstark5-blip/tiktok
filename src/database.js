@@ -99,8 +99,23 @@ async function ensureDatabase() {
 }
 
 async function initializeDatabase() {
-  if (process.env.SUPABASE_DB_URL || process.env.DATABASE_URL || (process.env.SUPABASE_DB_PASSWORD && process.env.SUPABASE_DB_HOST)) {
-    await bootstrapSchema();
+  if (process.env.SUPABASE_DB_MIGRATION_URL || process.env.SUPABASE_DB_URL || process.env.DATABASE_URL || (process.env.SUPABASE_DB_PASSWORD && process.env.SUPABASE_DB_HOST)) {
+    try {
+      await bootstrapSchema();
+    } catch (error) {
+      // Indices da migration 300 sao otimizacoes. Se o schema profissional
+      // essencial ja estiver disponivel via REST, login/API podem iniciar e a
+      // migration pendente sera tentada no proximo deploy com uma URL gravavel.
+      const db = getClient();
+      const probes = await Promise.all([
+        db.from('kf_products').select('id').limit(1),
+        db.from('kf_license_keys').select('id,key_hash,key_hint,notes,updated_at').limit(1),
+        db.from('kf_audit_logs').select('id').limit(1)
+      ]);
+      const schemaReady = probes.every((probe) => !probe.error);
+      if (!schemaReady) throw error;
+      console.warn(`[Supabase] Schema principal pronto; migration de indices ficou pendente: ${error.message}`);
+    }
   }
   const db = getClient();
   let schemaCheck = await db.from('kf_products').select('id').limit(1);
@@ -108,6 +123,13 @@ async function initializeDatabase() {
     await bootstrapSchema();
     for (let attempt = 0; attempt < 10; attempt += 1) {
       await new Promise((resolve) => setTimeout(resolve, 500));
+      schemaCheck = await db.from('kf_products').select('id').limit(1);
+      if (!schemaCheck.error) break;
+    }
+  }
+  if (schemaCheck.error && /schema cache|PGRST002/i.test(`${schemaCheck.error.message || ''} ${schemaCheck.error.code || ''}`)) {
+    for (let attempt = 0; attempt < 10; attempt += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 750));
       schemaCheck = await db.from('kf_products').select('id').limit(1);
       if (!schemaCheck.error) break;
     }
