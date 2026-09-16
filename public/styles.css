@@ -1,0 +1,111 @@
+:root {
+  --bg: #090b0f;
+  --surface: #101319;
+  --surface-2: #151920;
+  --surface-3: #1b2029;
+  --line: #242a34;
+  --line-soft: #1c212a;
+  --text: #f3f5f7;
+  --muted: #8d96a5;
+  --muted-2: #626b79;
+  --accent: #b8f34a;
+  --accent-dark: #151c09;
+  --violet: #8b7cf6;
+  --red: #ff6b78;
+  --amber: #f5bd4f;
+  --radius: 16px;
+  --shadow: 0 18px 60px rgba(0, 0, 0, .24);
+}
+
+* { box-sizing: border-box; }
+html { color-scheme: dark; }
+body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--text); font-family: "Inter", sans-serif; -webkit-font-smoothing: antialiased; }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+.hidden { display: none !important; }
+.noise { position: fixed; inset: 0; opacity: .018; pointer-events: none; z-index: 20; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.orb { position: fixed; width: 380px; height: 380px; border-radius: 50%; filter: blur(140px); opacity: .08; pointer-events: none; }
+.orb-one { background: var(--violet); top: -190px; left: 27%; }.orb-two { background: var(--accent); right: -250px; bottom: -210px; }
+
+.logo { display: flex; align-items: center; gap: 12px; font: 800 18px "Manrope", sans-serif; letter-spacing: -.03em; position: relative; z-index: 2; }
+.logo > span { display: grid; place-items: center; width: 38px; height: 38px; flex: 0 0 38px; border-radius: 11px; color: #101408; background: var(--accent); box-shadow: 0 8px 28px rgba(184, 243, 74, .18); }
+.logo > div { display: flex; flex-direction: column; line-height: 1.05; }
+.logo small { margin-top: 5px; color: var(--muted-2); font: 700 8px "Inter"; letter-spacing: .16em; }
+.eyebrow { color: var(--accent); letter-spacing: .16em; font-size: 10px; font-weight: 700; margin: 0 0 12px; }
+.muted { color: var(--muted); }
+
+/* Login */
+.login-shell { min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(420px, .85fr); }
+.brand-panel { min-height: 100vh; padding: 42px clamp(36px, 6vw, 96px); border-right: 1px solid var(--line-soft); position: relative; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; background: radial-gradient(circle at 75% 42%, rgba(139,124,246,.08), transparent 34%); }
+.brand-panel::after { content: ""; position: absolute; width: 520px; height: 520px; right: -170px; top: 16%; border: 1px solid rgba(255,255,255,.06); border-radius: 50%; box-shadow: 0 0 0 88px rgba(255,255,255,.025), 0 0 0 176px rgba(255,255,255,.012); }
+.hero-copy { max-width: 720px; position: relative; z-index: 1; animation: rise .65s ease both; }
+h1 { margin: 0; max-width: 720px; font: 700 clamp(43px, 5vw, 74px)/1.03 "Manrope", sans-serif; letter-spacing: -.055em; }
+h1 em { color: var(--muted); font-style: normal; }
+.subtitle { max-width: 540px; margin: 26px 0 38px; color: var(--muted); font-size: 16px; line-height: 1.75; }
+.stats { display: flex; gap: 42px; flex-wrap: wrap; }
+.stats div { display: flex; flex-direction: column; gap: 6px; }.stats strong { font: 700 18px "Manrope"; }.stats span { color: var(--muted-2); font-size: 11px; }
+.signal-card { position: relative; z-index: 1; display: flex; align-items: center; gap: 12px; }
+.signal-card div { display: flex; flex-direction: column; gap: 4px; }.signal-card strong { font-size: 12px; }.signal-card small { color: var(--muted-2); font-size: 11px; }
+.pulse, .aside-status i, .system-pill i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 5px rgba(184,243,74,.08); }
+.login-panel { display: grid; place-items: center; padding: 48px; background: rgba(12,14,19,.72); }
+.login-card { width: min(390px, 100%); animation: rise .65s .08s ease both; }
+.login-card h2 { margin: 0 0 8px; font: 700 34px "Manrope"; letter-spacing: -.04em; }.login-card > .muted { margin: 0 0 32px; font-size: 14px; }
+
+label { display: block; margin-top: 17px; color: #b8bec8; font-size: 12px; font-weight: 600; }
+input, select { width: 100%; margin-top: 8px; padding: 13px 14px; color: var(--text); background: #0c0f14; border: 1px solid var(--line); border-radius: 10px; outline: none; transition: border-color .2s, box-shadow .2s, background .2s; }
+input::placeholder { color: #4f5866; }
+input:focus, select:focus { background: #0e1218; border-color: #64723f; box-shadow: 0 0 0 3px rgba(184,243,74,.07); }
+.password-field { position: relative; }.password-field input { padding-right: 45px; }.password-field button { position: absolute; right: 9px; top: 14px; width: 34px; height: 34px; border: 0; color: var(--muted); background: transparent; }
+.primary { width: 100%; margin-top: 22px; padding: 13px 16px; border: 0; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; color: #111608; background: var(--accent); font-weight: 700; transition: transform .2s, box-shadow .2s; }
+.primary:hover { transform: translateY(-1px); box-shadow: 0 12px 30px rgba(184,243,74,.14); }.primary:active { transform: none; }
+.credentials { display: block; margin-top: 18px; color: var(--muted-2); text-align: center; font-size: 11px; }.credentials code { color: var(--accent); }.error { min-height: 16px; margin: 10px 0 -8px; color: var(--red); font-size: 12px; }
+
+/* Shell */
+.dashboard { min-height: 100vh; display: grid; grid-template-columns: 252px minmax(0, 1fr); }
+.dashboard aside { position: fixed; inset: 0 auto 0 0; width: 252px; padding: 28px 18px 20px; display: flex; flex-direction: column; border-right: 1px solid var(--line-soft); background: rgba(12,15,20,.94); backdrop-filter: blur(18px); z-index: 10; }
+.dashboard aside .logo { padding: 0 10px; }
+.dashboard nav { margin-top: 52px; }
+.nav-label { margin: 0 12px 10px; color: #596270; font-size: 9px; font-weight: 700; letter-spacing: .14em; }.nav-label-spaced { margin-top: 28px; }
+.nav-item, .logout { width: 100%; padding: 11px 12px; border: 0; border-radius: 10px; display: flex; align-items: center; gap: 11px; color: var(--muted); background: transparent; text-align: left; font-size: 13px; font-weight: 500; transition: color .2s, background .2s; }
+.nav-item b { width: 22px; height: 22px; display: grid; place-items: center; color: #697382; font-size: 15px; font-weight: 500; }.nav-item:hover { color: var(--text); background: rgba(255,255,255,.035); }.nav-item.active { color: var(--text); background: var(--surface-3); box-shadow: inset 2px 0 var(--accent); }.nav-item.active b { color: var(--accent); }
+.sidebar-footer { margin-top: auto; }.aside-status { margin: 0 4px 14px; padding: 12px; display: flex; gap: 11px; align-items: center; border: 1px solid var(--line-soft); border-radius: 11px; background: #0e1116; }.aside-status div { display: flex; flex-direction: column; gap: 3px; }.aside-status strong { font-size: 11px; }.aside-status small { color: var(--muted-2); font-size: 9px; }.logout { color: #747e8c; }.logout:hover { color: var(--red); background: rgba(255,107,120,.06); }
+
+.content { grid-column: 2; width: 100%; max-width: 1560px; margin: 0 auto; padding: 0 clamp(24px, 4vw, 64px) 56px; }
+.content header { height: 104px; margin-bottom: 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line-soft); }
+.breadcrumb { margin: 0 0 6px; color: var(--muted-2); font-size: 10px; text-transform: uppercase; letter-spacing: .1em; }.breadcrumb span { margin: 0 6px; color: #3f4651; }.content header h2 { margin: 0; font: 700 25px "Manrope"; letter-spacing: -.035em; }
+.header-actions { display: flex; align-items: center; gap: 14px; }.system-pill { height: 36px; padding: 0 13px; display: flex; align-items: center; gap: 9px; border: 1px solid var(--line); border-radius: 99px; color: #aab2bf; background: var(--surface); font-size: 10px; font-weight: 600; }.system-pill i { width: 6px; height: 6px; box-shadow: none; }.avatar { width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid #3a4224; border-radius: 11px; color: var(--accent); background: #171c10; font: 700 13px "Manrope"; }
+
+.page { display: none; animation: rise .35s ease both; }.active-page { display: block; }
+.metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.metric-grid article, .panel, .product-card { border: 1px solid var(--line-soft); border-radius: var(--radius); background: var(--surface); box-shadow: 0 1px 0 rgba(255,255,255,.015); }
+.metric-grid article { min-height: 156px; padding: 19px; display: flex; flex-direction: column; transition: transform .2s, border-color .2s; }.metric-grid article:hover { transform: translateY(-2px); border-color: #303743; }
+.metric-top { display: flex; justify-content: space-between; align-items: center; }.metric-top span { color: var(--muted); font-size: 11px; font-weight: 500; }.metric-top i { width: 29px; height: 29px; display: grid; place-items: center; border-radius: 8px; color: var(--accent); background: rgba(184,243,74,.07); font-style: normal; font-size: 12px; }
+.metric-grid article > strong { margin-top: auto; font: 700 34px "Manrope"; letter-spacing: -.05em; }.metric-grid article > small { margin-top: 3px; color: var(--muted-2); font-size: 10px; }
+.metric-grid .accent-card { border-color: #283315; background: linear-gradient(145deg, #151c0d, #10150b); }.accent-card .metric-top i { color: #111608; background: var(--accent); }
+
+.split-grid { display: grid; grid-template-columns: minmax(340px, .9fr) minmax(400px, 1.1fr); gap: 14px; margin-top: 14px; }.panel { padding: 22px; }.panel-head { display: flex; justify-content: space-between; align-items: flex-start; }.panel h3, .section-copy h3 { margin: 0; font: 700 20px "Manrope"; letter-spacing: -.035em; }.icon-chip { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid #2c3820; border-radius: 9px; color: var(--accent); background: #151b10; }.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }.batch-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.generated { margin-top: 14px; padding: 13px; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; border: 1px solid #33421c; border-radius: 10px; background: #12170d; }.generated small { grid-column: 1/-1; color: var(--accent); font-size: 9px; font-weight: 700; letter-spacing: .12em; }.generated pre { max-height: 180px; margin: 0; overflow: auto; color: #dce5cf; font: 10px/1.65 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre-wrap; word-break: break-all; }.generated button, .text-button { padding: 0; border: 0; color: var(--accent); background: transparent; font-size: 11px; font-weight: 600; align-self: start; }
+.activity-list { margin-top: 12px; }.activity { display: grid; grid-template-columns: auto minmax(0,1fr) auto; gap: 11px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line-soft); }.activity:last-child { border-bottom: 0; }.activity-icon { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; color: var(--accent); background: #161c10; }.activity div { min-width: 0; }.activity code { display: block; overflow: hidden; color: #d7dbe1; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }.activity small { color: var(--muted-2); font-size: 9px; }
+.status { display: inline-flex; padding: 4px 8px; border: 1px solid #31401d; border-radius: 99px; color: var(--accent); background: #151b10; font-size: 9px; font-weight: 700; letter-spacing: .04em; }.status.disabled { border-color: #3e2329; color: var(--red); background: #1b1114; }
+
+.section-copy { margin-bottom: 24px; }.section-copy .muted { margin: 7px 0 0; font-size: 12px; }.product-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }.product-card { padding: 22px; transition: border-color .2s, transform .2s; }.product-card:hover { transform: translateY(-2px); border-color: #343b47; }.product-number { color: #343b46; font: 700 36px "Manrope"; }.product-card h4 { margin: 28px 0 7px; font: 700 19px "Manrope"; }.product-card p { min-height: 38px; color: var(--muted); font-size: 12px; line-height: 1.55; }.product-card footer { margin-top: 20px; padding-top: 15px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line-soft); }.product-card strong { color: var(--accent); font-size: 13px; }.product-card code { color: var(--muted-2); font-size: 10px; }
+
+.table-wrap { overflow: auto; border: 1px solid var(--line-soft); border-radius: 13px; background: var(--surface); }.table-wrap table { width: 100%; min-width: 740px; border-collapse: collapse; }.table-wrap th, .table-wrap td { padding: 14px 16px; border-bottom: 1px solid var(--line-soft); text-align: left; font-size: 11px; }.table-wrap th { position: sticky; top: 0; z-index: 1; color: var(--muted-2); background: #0e1116; font-size: 9px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }.table-wrap tbody tr { transition: background .15s; }.table-wrap tbody tr:hover { background: rgba(255,255,255,.018); }.table-wrap tbody tr:last-child td { border-bottom: 0; }.table-wrap td code { color: #d3d7de; font-size: 10px; }.action-btn { padding: 6px 9px; border: 1px solid var(--line); border-radius: 7px; color: #a4acb8; background: #12161c; font-size: 9px; }.action-btn:hover { color: var(--text); border-color: #3a424f; }.empty { padding: 28px !important; color: var(--muted-2); text-align: center !important; }
+
+.database-status { display: grid; grid-template-columns: 2fr repeat(3,1fr); gap: 20px; align-items: center; margin-bottom: 14px; }.database-status > div { display: flex; align-items: center; gap: 11px; }.database-status > div:not(:first-child) { padding-left: 20px; flex-direction: column; align-items: flex-start; gap: 4px; border-left: 1px solid var(--line-soft); }.database-status > div:first-child div { display: flex; flex-direction: column; gap: 3px; }.database-status small { color: var(--muted-2); font-size: 9px; }.database-status strong { font: 700 12px "Manrope"; }.db-indicator { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 5px rgba(184,243,74,.07); }
+.db-table-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px,1fr)); gap: 10px; margin-bottom: 14px; }.db-table-card { padding: 15px; border: 1px solid var(--line-soft); border-radius: 11px; background: var(--surface); }.db-table-card span { display: block; overflow: hidden; color: var(--muted-2); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }.db-table-card strong { display: block; margin-top: 7px; font: 700 23px "Manrope"; }.database-grid { grid-template-columns: minmax(300px,.75fr) minmax(440px,1.25fr); }.compact-table { max-height: 340px; margin-top: 18px; }.compact-table table { min-width: 470px; }.db-keys-title { margin-top: 34px; }
+.toast { position: fixed; right: 24px; bottom: 24px; z-index: 30; padding: 12px 16px; border: 1px solid #d9dfcf; border-radius: 10px; color: #101408; background: #f2f5ed; box-shadow: var(--shadow); font-size: 11px; font-weight: 700; opacity: 0; transform: translateY(24px); transition: opacity .25s, transform .25s; pointer-events: none; }.toast.show { opacity: 1; transform: none; }
+
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+@media (max-width: 1100px) {
+  .login-shell { grid-template-columns: 1fr 430px; }.brand-panel { padding: 38px; }
+  .metric-grid { grid-template-columns: 1fr 1fr; }.split-grid, .database-grid { grid-template-columns: 1fr; }.product-grid { grid-template-columns: 1fr 1fr; }.database-status { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 780px) {
+  .login-shell { grid-template-columns: 1fr; }.brand-panel { min-height: 54vh; border-right: 0; border-bottom: 1px solid var(--line-soft); }.hero-copy { margin: 72px 0; }.login-panel { padding: 58px 24px; }
+  .dashboard { grid-template-columns: 70px minmax(0,1fr); }.dashboard aside { width: 70px; padding: 22px 10px; }.dashboard aside .logo { padding: 0; justify-content: center; }.dashboard aside .logo > div, .nav-label, .nav-item span, .aside-status div, .logout span { display: none; }.dashboard nav { margin-top: 42px; }.nav-label-spaced { margin-top: 20px; }.nav-item, .logout { justify-content: center; padding: 11px; }.nav-item b { width: 24px; }.aside-status { justify-content: center; padding: 12px 8px; }.content { grid-column: 2; padding: 0 16px 40px; }.content header { height: 88px; margin-bottom: 24px; }.system-pill { display: none; }.metric-grid, .product-grid { grid-template-columns: 1fr; }.form-row { grid-template-columns: 1fr; }.database-status { grid-template-columns: 1fr; }.database-status > div:not(:first-child) { padding: 12px 0 0; border-left: 0; border-top: 1px solid var(--line-soft); }
+}
+@media (max-width: 480px) {
+  .brand-panel { padding: 26px 22px; }.brand-panel::after { display: none; }h1 { font-size: 40px; }.stats { gap: 22px; }.content header h2 { font-size: 21px; }.metric-grid article { min-height: 140px; }.panel { padding: 18px; }
+}

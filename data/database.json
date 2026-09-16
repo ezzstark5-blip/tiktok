@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "users": [
+    {
+      "id": "cdd40b8e-ccc7-4b4d-8537-d01096dc090f",
+      "username": "1",
+      "password": "1ce8d28fda0e6926f083920e3235aa59:8b119509fad7ce5510adf15865b0343841924b814a2bfbe9bd317b107dcaaaf0db94d1a6687fbf4baff717a26ccee4029bdc26db53177a3480336f9414b70dcc",
+      "role": "admin",
+      "createdAt": "2026-09-15T23:52:16.804Z"
+    }
+  ],
+  "products": [
+    {
+      "id": "stark-menu",
+      "name": "Stark Menu",
+      "description": "Acesso ao produto Stark Menu.",
+      "price": 59.9,
+      "active": true
+    },
+    {
+      "id": "bypass-cfx",
+      "name": "Bypass CFX",
+      "description": "Acesso ao produto Bypass CFX.",
+      "price": 39.9,
+      "active": true
+    },
+    {
+      "id": "stark-spoofer",
+      "name": "Stark Spoofer",
+      "description": "Acesso ao produto Stark Spoofer.",
+      "price": 49.9,
+      "active": true
+    }
+  ],
+  "keys": [],
+  "sessions": [
+    {
+      "id": "58a08d20-e8dd-4050-950c-4220dbf928c5",
+      "userId": "cdd40b8e-ccc7-4b4d-8537-d01096dc090f",
+      "tokenHash": "5df97493eb677ad470908347ec01e9be806da24dc2c2c8e3d21743cac0d7e4c8",
+      "expiresAt": "2026-09-16T11:56:22.788Z"
+    }
+  ]
+}
