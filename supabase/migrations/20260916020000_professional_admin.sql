@@ -5,11 +5,26 @@ alter table public.kf_license_keys add column if not exists key_hint varchar(80)
 alter table public.kf_license_keys add column if not exists notes varchar(500) not null default '';
 alter table public.kf_license_keys add column if not exists updated_at timestamptz not null default now();
 
+-- Durante o backfill aceitamos temporariamente o valor legado `disabled` e
+-- os novos estados. Isso evita violacao da constraint ao converter os dados.
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'kf_license_keys_status_check'
+      and pg_get_constraintdef(oid) ilike '%blocked%'
+  ) then
+    alter table public.kf_license_keys drop constraint if exists kf_license_keys_status_check;
+    alter table public.kf_license_keys add constraint kf_license_keys_status_check
+      check (status in ('active', 'used', 'revoked', 'blocked', 'disabled')) not valid;
+  end if;
+end;
+$$;
+
 -- Backfill in loturi mici cu COMMIT per lot (procedura + CALL).
 -- INAINTE erau 4x UPDATE full-table intr-o singura tranzactie: pe tabele
 -- mari depaseau statement_timeout-ul si faceau rollback la TOT la fiecare
 -- boot — migratia nu se termina niciodata si bloca toata baza.
--- Fiecare lot atinge max 5000 randuri (sub timeout), iar WHERE-urile
+-- Fiecare lot atinge max 250 randuri, iar WHERE-urile
 -- ... IS NULL fac reluarea idempotenta: la retry continua de unde a ramas.
 create or replace procedure public.kf_backfill_hashes()
 language plpgsql
@@ -20,7 +35,7 @@ begin
   loop
     update public.kf_license_keys
     set key_hash = encode(digest(upper(trim(license_key)), 'sha256'), 'hex')
-    where id in (select id from public.kf_license_keys where key_hash is null limit 5000);
+    where id in (select id from public.kf_license_keys where key_hash is null limit 250);
     get diagnostics n = row_count;
     commit;
     exit when n = 0;
@@ -28,21 +43,21 @@ begin
   loop
     update public.kf_license_keys
     set key_hint = 'KF-****-****-' || right(replace(license_key, '-', ''), 6) || '-' || left(id::text, 6)
-    where id in (select id from public.kf_license_keys where key_hint is null limit 5000);
+    where id in (select id from public.kf_license_keys where key_hint is null limit 250);
     get diagnostics n = row_count;
     commit;
     exit when n = 0;
   end loop;
   loop
     update public.kf_license_keys set license_key = key_hint
-    where id in (select id from public.kf_license_keys where license_key <> key_hint limit 5000);
+    where id in (select id from public.kf_license_keys where license_key <> key_hint limit 250);
     get diagnostics n = row_count;
     commit;
     exit when n = 0;
   end loop;
   loop
     update public.kf_license_keys set status = 'blocked'
-    where id in (select id from public.kf_license_keys where status = 'disabled' limit 5000);
+    where id in (select id from public.kf_license_keys where status = 'disabled' limit 250);
     get diagnostics n = row_count;
     commit;
     exit when n = 0;
@@ -58,18 +73,17 @@ create unique index if not exists idx_kf_keys_hash on public.kf_license_keys(key
 create index if not exists idx_kf_keys_created on public.kf_license_keys(created_at desc);
 create index if not exists idx_kf_keys_product_status on public.kf_license_keys(product_id, status);
 
--- Swap-ul de constraint rula DROP+ADD la FIECARE boot (validare full-table
--- de fiecare data). Gardat: sare peste daca definitia contine deja 'blocked'.
+-- Remove o estado legado depois do backfill e valida a constraint definitiva.
 do $$
 begin
-  if not exists (
-    select 1 from pg_constraint
-    where conname = 'kf_license_keys_status_check'
-      and pg_get_constraintdef(oid) ilike '%blocked%'
+  if exists (
+    select 1 from pg_constraint where conname = 'kf_license_keys_status_check'
+      and pg_get_constraintdef(oid) ilike '%disabled%'
   ) then
     alter table public.kf_license_keys drop constraint if exists kf_license_keys_status_check;
     alter table public.kf_license_keys add constraint kf_license_keys_status_check
-      check (status in ('active', 'used', 'revoked', 'blocked'));
+      check (status in ('active', 'used', 'revoked', 'blocked')) not valid;
+    alter table public.kf_license_keys validate constraint kf_license_keys_status_check;
   end if;
 end;
 $$;
