@@ -188,8 +188,11 @@ app.post('/api/logout', requireAuth, async (request, response) => {
 
 app.get('/api/products', async (_request, response) => response.json(await listProducts()));
 
-app.get('/api/keys', requireAuth, requireAdmin, async (_request, response) => {
-  response.json(await getAllKeys());
+app.get('/api/keys', requireAuth, requireAdmin, async (request, response) => {
+  // Cap para nao estourar o statement_timeout: ?limit= (default 1000, max 5000).
+  // Para paginacao completa use GET /api/admin/keys?page=&pageSize=.
+  const limit = Math.min(5000, Math.max(1, Number(request.query.limit) || 1000));
+  response.json(await getAllKeys({ limit }));
 });
 
 app.post('/api/keys', requireAuth, requireAdmin, async (request, response) => {
@@ -430,7 +433,11 @@ app.get('*path', (_request, response) => response.sendFile(path.join(publicDir, 
 
 app.use((error, _request, response, _next) => {
   console.error(error);
-  response.status(error.status || 500).json({ error: error.message || 'Erro interno.' });
+  const status = error.status || 500;
+  const payload = { error: error.message || 'Erro interno.' };
+  // 503 + retryable:true permite ao painel exibir "tente de novo" em vez de erro fatal.
+  if (error.code === 'STATEMENT_TIMEOUT' || status === 503) payload.retryable = true;
+  response.status(status).json(payload);
 });
 
 async function main() {
