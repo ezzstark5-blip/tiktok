@@ -36,15 +36,26 @@ function getClient() {
 
 function fail(error) {
   if (!error) return;
+  const text = `${error.message || ''} ${error.code || ''}`;
   // Supabase/Postgres: "canceling statement due to statement timeout"
   // acontece quando a query estoura o statement_timeout (plano free ~8s).
   // Converte em 503 com mensagem acionavel em vez de 500 generico.
-  if (/statement timeout|57014|canceling statement/i.test(`${error.message || ''} ${error.code || ''}`)) {
+  if (/statement timeout|57014|canceling statement/i.test(text)) {
     const timeoutError = new Error('Supabase: canceling statement due to statement timeout (query lenta; veja getDatabaseStatus/getAllKeys/listKeysPage — use paginacao e indices da migracao 20260916030000).');
     timeoutError.status = 503;
     timeoutError.code = 'STATEMENT_TIMEOUT';
     timeoutError.cause = error;
     throw timeoutError;
+  }
+  // PostgREST pierde cache-ul de schema dupa DDL (migrari / rollback-uri):
+  // "Could not query the database for the schema cache". E tranzitoriu —
+  // 503 retryable, nu 500 fatal (altfel login-ul pica definitiv mid-deploy).
+  if (/schema cache|PGRST002/i.test(text)) {
+    const cacheError = new Error('Supabase: schema cache indisponibil temporar (DDL in curs), reincercati.');
+    cacheError.status = 503;
+    cacheError.code = 'SCHEMA_CACHE';
+    cacheError.cause = error;
+    throw cacheError;
   }
   throw new Error(`Supabase: ${error.message}`);
 }
