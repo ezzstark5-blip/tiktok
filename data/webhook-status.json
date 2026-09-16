@@ -1,0 +1,124 @@
+{
+  "messageId": "1549857395956523029",
+  "routes": {
+    "GET /api/health": {
+      "method": "GET",
+      "route": "/api/health",
+      "status": 200,
+      "durationMs": 88.1425,
+      "updatedAt": "2026-09-16T19:04:48.028Z"
+    },
+    "POST /api/login": {
+      "method": "POST",
+      "route": "/api/login",
+      "status": 200,
+      "durationMs": 462.5226,
+      "updatedAt": "2026-09-16T19:04:40.493Z"
+    },
+    "POST /api/logout": {
+      "method": "POST",
+      "route": "/api/logout",
+      "status": 204,
+      "durationMs": 276.793205,
+      "updatedAt": "2026-09-16T02:34:53.424Z"
+    },
+    "GET /api/products": {
+      "method": "GET",
+      "route": "/api/products",
+      "status": 304,
+      "durationMs": 189.484588,
+      "updatedAt": "2026-09-16T19:02:10.585Z"
+    },
+    "GET /api/keys": {
+      "method": "GET",
+      "route": "/api/keys",
+      "status": 304,
+      "durationMs": 531.283407,
+      "updatedAt": "2026-09-16T19:02:10.975Z"
+    },
+    "POST /api/keys": {
+      "method": "POST",
+      "route": "/api/keys",
+      "status": 201,
+      "durationMs": 299.2326,
+      "updatedAt": "2026-09-16T19:04:41.062Z"
+    },
+    "PATCH /api/keys/:id/status": {
+      "method": "PATCH",
+      "route": "/api/keys/:id/status",
+      "status": 200,
+      "durationMs": 281.481103,
+      "updatedAt": "2026-09-16T02:34:48.769Z"
+    },
+    "POST /api/licenses/validate": {
+      "method": "POST",
+      "route": "/api/licenses/validate",
+      "status": null,
+      "durationMs": null,
+      "updatedAt": null
+    },
+    "POST /api/client/query": {
+      "method": "POST",
+      "route": "/api/client/query",
+      "status": 200,
+      "durationMs": 3867.0934,
+      "updatedAt": "2026-09-16T00:05:38.880Z"
+    },
+    "GET /api/admin/database": {
+      "method": "GET",
+      "route": "/api/admin/database",
+      "status": 200,
+      "durationMs": 565.477291,
+      "updatedAt": "2026-09-16T19:02:11.696Z"
+    },
+    "POST /api/admin/users": {
+      "method": "POST",
+      "route": "/api/admin/users",
+      "status": 201,
+      "durationMs": 811.269803,
+      "updatedAt": "2026-09-16T02:34:43.667Z"
+    },
+    "POSTGRES supabase": {
+      "method": "POSTGRES",
+      "route": "supabase",
+      "status": 200,
+      "durationMs": 89.3428,
+      "updatedAt": "2026-09-16T19:04:02.401Z"
+    },
+    "MYSQL defaultdb": {
+      "method": "MYSQL",
+      "route": "defaultdb",
+      "status": 200,
+      "durationMs": 161.2741,
+      "updatedAt": "2026-09-16T01:40:21.732Z"
+    },
+    "GET /api/client/products": {
+      "method": "GET",
+      "route": "/api/client/products",
+      "status": 200,
+      "durationMs": 410.920544,
+      "updatedAt": "2026-09-16T02:34:52.318Z"
+    },
+    "POST /api/client/redeem": {
+      "method": "POST",
+      "route": "/api/client/redeem",
+      "status": 200,
+      "durationMs": 536.646731,
+      "updatedAt": "2026-09-16T02:34:47.509Z"
+    },
+    "POST /api/register": {
+      "method": "POST",
+      "route": "/api/register",
+      "status": 201,
+      "durationMs": 454.518876,
+      "updatedAt": "2026-09-16T02:34:51.493Z"
+    },
+    "GET *path": {
+      "method": "GET",
+      "route": "*path",
+      "status": 304,
+      "durationMs": 0.627568,
+      "updatedAt": "2026-09-16T19:02:10.003Z"
+    }
+  }
+}
