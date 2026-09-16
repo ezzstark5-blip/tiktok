@@ -5,7 +5,7 @@ const { Client } = require('pg');
 const ADVISORY_LOCK_ID = 42424201;
 
 function databaseUrl() {
-  const configured = String(process.env.SUPABASE_DB_URL || process.env.DATABASE_URL || '').trim();
+  const configured = String(process.env.SUPABASE_DB_MIGRATION_URL || process.env.SUPABASE_DB_URL || process.env.DATABASE_URL || '').trim();
   if (configured && !configured.includes('[YOUR-PASSWORD]')) return configured;
   const password = String(process.env.SUPABASE_DB_PASSWORD || '').trim();
   const host = String(process.env.SUPABASE_DB_HOST || '').trim();
@@ -94,6 +94,14 @@ async function bootstrapSchema() {
   try {
     console.log('[Supabase] Criando/atualizando o banco automaticamente...');
     await client.connect();
+    const { rows: writableRows } = await client.query(
+      "select current_setting('transaction_read_only') as read_only, pg_is_in_recovery() as recovery"
+    );
+    if (writableRows[0]?.read_only === 'on' || writableRows[0]?.recovery === true) {
+      const readOnlyError = new Error('A URL PostgreSQL configurada aponta para uma conexao somente leitura. Configure SUPABASE_DB_MIGRATION_URL com o Session Pooler primario (porta 5432).');
+      readOnlyError.code = 'READ_ONLY_DATABASE';
+      throw readOnlyError;
+    }
     let haveLock = false;
     try {
       // O lock e adquirido UMA vez antes de qualquer DDL. Se outro deploy
@@ -170,7 +178,9 @@ async function bootstrapSchema() {
     }
     console.log('[Supabase] Banco criado/atualizado com sucesso.');
   } catch (error) {
-    throw new Error(`Falha ao criar o banco automaticamente: ${error.message}`);
+    const wrapped = new Error(`Falha ao criar o banco automaticamente: ${error.message}`);
+    wrapped.code = error.code || (/read-only transaction/i.test(error.message) ? 'READ_ONLY_DATABASE' : 'MIGRATION_ERROR');
+    throw wrapped;
   } finally {
     await client.end().catch(() => {});
   }
