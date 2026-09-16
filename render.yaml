@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: api-control-center
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DEBUG_MODE
+        value: false
+      - key: PUBLIC_URL
+        sync: false
+      - key: CLIENT_ENCRYPTION_KEY
+        sync: false
+      - key: SUPABASE_URL
+        value: "https://cpftubhrnkxdamlonoga.supabase.co"
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_DB_URL
+        sync: false
+      - key: DISCORD_TOKEN
+        sync: false
+      - key: DISCORD_CLIENT_ID
+        sync: false
+      - key: DISCORD_GUILD_ID
+        sync: false
+      - key: DISCORD_ADMIN_USER_IDS
+        sync: false
+      - key: DISCORD_ADMIN_ROLE_IDS
+        sync: false
+      - key: DISCORD_CHANNEL_STATUS_API
+        value: "1549565302625271849"
+      - key: DISCORD_CHANNEL_KEYS
+        value: "1549565411409002627"
+      - key: DISCORD_CHANNEL_USERS
+        value: "1549565452928159765"
+      - key: DISCORD_CHANNEL_DATABASE
+        value: "1549856649764675704"
