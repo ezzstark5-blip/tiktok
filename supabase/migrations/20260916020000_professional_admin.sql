@@ -5,25 +5,74 @@ alter table public.kf_license_keys add column if not exists key_hint varchar(80)
 alter table public.kf_license_keys add column if not exists notes varchar(500) not null default '';
 alter table public.kf_license_keys add column if not exists updated_at timestamptz not null default now();
 
-update public.kf_license_keys
-set key_hash = encode(digest(upper(trim(license_key)), 'sha256'), 'hex')
-where key_hash is null;
+-- Backfill in loturi mici cu COMMIT per lot (procedura + CALL).
+-- INAINTE erau 4x UPDATE full-table intr-o singura tranzactie: pe tabele
+-- mari depaseau statement_timeout-ul si faceau rollback la TOT la fiecare
+-- boot — migratia nu se termina niciodata si bloca toata baza.
+-- Fiecare lot atinge max 5000 randuri (sub timeout), iar WHERE-urile
+-- ... IS NULL fac reluarea idempotenta: la retry continua de unde a ramas.
+create or replace procedure public.kf_backfill_hashes()
+language plpgsql
+as $$
+declare
+  n integer;
+begin
+  loop
+    update public.kf_license_keys
+    set key_hash = encode(digest(upper(trim(license_key)), 'sha256'), 'hex')
+    where id in (select id from public.kf_license_keys where key_hash is null limit 5000);
+    get diagnostics n = row_count;
+    commit;
+    exit when n = 0;
+  end loop;
+  loop
+    update public.kf_license_keys
+    set key_hint = 'KF-****-****-' || right(replace(license_key, '-', ''), 6) || '-' || left(id::text, 6)
+    where id in (select id from public.kf_license_keys where key_hint is null limit 5000);
+    get diagnostics n = row_count;
+    commit;
+    exit when n = 0;
+  end loop;
+  loop
+    update public.kf_license_keys set license_key = key_hint
+    where id in (select id from public.kf_license_keys where license_key <> key_hint limit 5000);
+    get diagnostics n = row_count;
+    commit;
+    exit when n = 0;
+  end loop;
+  loop
+    update public.kf_license_keys set status = 'blocked'
+    where id in (select id from public.kf_license_keys where status = 'disabled' limit 5000);
+    get diagnostics n = row_count;
+    commit;
+    exit when n = 0;
+  end loop;
+end;
+$$;
 
-update public.kf_license_keys
-set key_hint = 'KF-****-****-' || right(replace(license_key, '-', ''), 6) || '-' || left(id::text, 6)
-where key_hint is null;
-
-update public.kf_license_keys set license_key = key_hint where license_key <> key_hint;
+call public.kf_backfill_hashes();
+drop procedure public.kf_backfill_hashes();
 
 alter table public.kf_license_keys alter column key_hash set not null;
 create unique index if not exists idx_kf_keys_hash on public.kf_license_keys(key_hash);
 create index if not exists idx_kf_keys_created on public.kf_license_keys(created_at desc);
 create index if not exists idx_kf_keys_product_status on public.kf_license_keys(product_id, status);
 
-alter table public.kf_license_keys drop constraint if exists kf_license_keys_status_check;
-update public.kf_license_keys set status = 'blocked' where status = 'disabled';
-alter table public.kf_license_keys add constraint kf_license_keys_status_check
-  check (status in ('active', 'used', 'revoked', 'blocked'));
+-- Swap-ul de constraint rula DROP+ADD la FIECARE boot (validare full-table
+-- de fiecare data). Gardat: sare peste daca definitia contine deja 'blocked'.
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint
+    where conname = 'kf_license_keys_status_check'
+      and pg_get_constraintdef(oid) ilike '%blocked%'
+  ) then
+    alter table public.kf_license_keys drop constraint if exists kf_license_keys_status_check;
+    alter table public.kf_license_keys add constraint kf_license_keys_status_check
+      check (status in ('active', 'used', 'revoked', 'blocked'));
+  end if;
+end;
+$$;
 
 alter table public.kf_activations add column if not exists activation_ip varchar(64);
 
