@@ -13,6 +13,62 @@ function fail(error) {
   if (error) throw new Error(`Supabase: ${error.message}`);
 }
 
+const activationLocks = new Map();
+
+async function withActivationLock(keyDigest, task) {
+  const previous = activationLocks.get(keyDigest) || Promise.resolve();
+  const current = previous.catch(() => {}).then(task);
+  activationLocks.set(keyDigest, current);
+  try { return await current; }
+  finally { if (activationLocks.get(keyDigest) === current) activationLocks.delete(keyDigest); }
+}
+
+async function activateKeyWithoutRpc({ key, productId, fingerprint, userId, activationIp }) {
+  const db = getClient();
+  const keyDigest = hashKey(key);
+  return withActivationLock(keyDigest, async () => {
+    const { data: license, error } = await db.from('kf_license_keys')
+      .select('id,product_id,status,expires_at,max_activations,redeemed_by_user_id')
+      .eq('key_hash', keyDigest).maybeSingle();
+    fail(error);
+    if (!license) return { valid: false, reason: 'KEY_NOT_FOUND' };
+    if (productId && license.product_id !== productId) return { valid: false, reason: 'WRONG_PRODUCT' };
+    if (license.status === 'blocked' || license.status === 'disabled') return { valid: false, reason: 'KEY_BLOCKED' };
+    if (license.status === 'revoked') return { valid: false, reason: 'KEY_REVOKED' };
+    if (new Date(license.expires_at) <= new Date()) return { valid: false, reason: 'KEY_EXPIRED' };
+    if (userId && license.redeemed_by_user_id && license.redeemed_by_user_id !== userId) {
+      return { valid: false, reason: 'KEY_ALREADY_REDEEMED' };
+    }
+
+    const { data: activations, error: activationError } = await db.from('kf_activations')
+      .select('hwid_hash,activated_at').eq('license_id', license.id).order('activated_at');
+    fail(activationError);
+    const existingIndex = activations.findIndex((item) => item.hwid_hash === fingerprint);
+    if (existingIndex >= 0) {
+      const { error: updateError } = await db.from('kf_activations').update({
+        last_seen_at: new Date().toISOString(), activation_ip: activationIp ? String(activationIp).slice(0, 64) : null
+      }).eq('license_id', license.id).eq('hwid_hash', fingerprint);
+      fail(updateError);
+      return { valid: true, productId: license.product_id, expiresAt: license.expires_at,
+        activation: existingIndex + 1, maxActivations: Number(license.max_activations) };
+    }
+    if (activations.length >= Number(license.max_activations)) return { valid: false, reason: 'ACTIVATION_LIMIT' };
+
+    const now = new Date().toISOString();
+    const { error: insertError } = await db.from('kf_activations').insert({
+      license_id: license.id, hwid_hash: fingerprint, activated_at: now, last_seen_at: now,
+      activation_ip: activationIp ? String(activationIp).slice(0, 64) : null
+    });
+    if (insertError?.code !== '23505') fail(insertError);
+    const changes = { status: 'used', updated_at: now };
+    if (userId && !license.redeemed_by_user_id) changes.redeemed_by_user_id = userId;
+    const { error: licenseError } = await db.from('kf_license_keys').update(changes).eq('id', license.id);
+    fail(licenseError);
+    return { valid: true, productId: license.product_id, expiresAt: license.expires_at,
+      activation: activations.length + 1, maxActivations: Number(license.max_activations) };
+  });
+}
+
 async function createKeys({ productId, days = 30, maxActivations = 1, quantity = 1, createdBy = 'api' }) {
   const parsedDays = Number(days);
   const parsedMax = Number(maxActivations);
@@ -54,6 +110,10 @@ async function activateKey({ key, productId = null, hwid, userId = null, activat
     p_key: String(key).trim().toUpperCase(), p_product_id: productId || null,
     p_hwid_hash: fingerprint, p_user_id: userId || null, p_activation_ip: activationIp || null
   });
+  if (error && /function digest|digest\(text|42883/i.test(`${error.message || ''} ${error.code || ''}`)) {
+    console.warn('[Licenses] RPC sem pgcrypto no search_path; usando validacao segura pelo backend.');
+    return activateKeyWithoutRpc({ key, productId, fingerprint, userId, activationIp });
+  }
   fail(error);
   return data;
 }
