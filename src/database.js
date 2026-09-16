@@ -22,7 +22,18 @@ function getClient() {
 }
 
 function fail(error) {
-  if (error) throw new Error(`Supabase: ${error.message}`);
+  if (!error) return;
+  // Supabase/Postgres: "canceling statement due to statement timeout"
+  // acontece quando a query estoura o statement_timeout (plano free ~8s).
+  // Converte em 503 com mensagem acionavel em vez de 500 generico.
+  if (/statement timeout|57014|canceling statement/i.test(`${error.message || ''} ${error.code || ''}`)) {
+    const timeoutError = new Error('Supabase: canceling statement due to statement timeout (query lenta; veja getDatabaseStatus/getAllKeys/listKeysPage — use paginacao e indices da migracao 20260916030000).');
+    timeoutError.status = 503;
+    timeoutError.code = 'STATEMENT_TIMEOUT';
+    timeoutError.cause = error;
+    throw timeoutError;
+  }
+  throw new Error(`Supabase: ${error.message}`);
 }
 
 function iso(value) { return value ? new Date(value).toISOString() : null; }
@@ -86,21 +97,29 @@ async function checkDatabase() {
 }
 
 async function tableCount(table) {
-  const { count, error } = await getClient().from(table).select('*', { count: 'exact', head: true });
+  // count:'exact' faz SEQ SCAN completo — estoura statement_timeout quando
+  // kf_license_keys / kf_audit_logs / kf_activations crescem.
+  // 'estimated' usa estatisticas do Postgres (pg_class.reltuples): O(1).
+  const { count, error } = await getClient().from(table).select('*', { count: 'estimated', head: true });
   fail(error);
-  return count || 0;
+  return count ?? 0;
 }
 
 async function getDatabaseStatus() {
   await ensureDatabase();
   const started = process.hrtime.bigint();
   const names = ['kf_users', 'kf_products', 'kf_license_keys', 'kf_activations', 'kf_sessions', 'kf_audit_logs', 'kf_key_history', 'kf_meta'];
-  const counts = await Promise.all(names.map(tableCount));
+  // allSettled: uma tabela lenta (ex. audit_logs sem vacuum) nao derruba o painel inteiro.
+  const results = await Promise.allSettled(names.map(tableCount));
+  const tables = names.map((name, index) => {
+    const settled = results[index];
+    return { name, rows: settled.status === 'fulfilled' ? settled.value : null };
+  });
   return {
     online: true, latencyMs: Number(process.hrtime.bigint() - started) / 1e6,
     engine: 'PostgreSQL (Supabase REST)', database: 'postgres',
-    host: 'cpftubhrnkxdamlonoga.supabase.co', ssl: true,
-    tables: names.map((name, index) => ({ name, rows: counts[index] }))
+    host: new URL(process.env.SUPABASE_URL).hostname, ssl: true,
+    tables
   };
 }
 
@@ -131,37 +150,54 @@ async function getUserProducts(userId) {
   }));
 }
 
-async function getAllKeys() {
+async function getAllKeys({ limit = 1000 } = {}) {
   await ensureDatabase();
+  const safeLimit = Math.min(5000, Math.max(1, Number(limit) || 1000));
   const db = getClient();
-  const [{ data: keys, error }, { data: activations, error: activationError }] = await Promise.all([
-    db.from('kf_license_keys').select('*').order('created_at', { ascending: false }),
-    db.from('kf_activations').select('*')
-  ]);
-  fail(error); fail(activationError);
+  // ANTES: sem .limit() — buscava TODAS as keys + TODAS as activations.
+  // Com 5k-50k keys isso estoura o statement_timeout do Supabase.
+  // AGORA: pagina as N mais recentes e busca activations so dessas keys.
+  const { data: keys, error } = await db.from('kf_license_keys')
+    .select('*').order('created_at', { ascending: false }).limit(safeLimit);
+  fail(error);
+  if (!keys?.length) return [];
+  const { data: activations, error: activationError } = await db.from('kf_activations')
+    .select('license_id,hwid_hash,activation_ip,activated_at,last_seen_at')
+    .in('license_id', keys.map((item) => item.id));
+  fail(activationError);
+  const byLicense = new Map();
+  for (const item of activations || []) {
+    if (!byLicense.has(item.license_id)) byLicense.set(item.license_id, []);
+    byLicense.get(item.license_id).push({
+      hwidHash: item.hwid_hash, activationIp: item.activation_ip || null, activatedAt: iso(item.activated_at),
+      ...(item.last_seen_at ? { lastSeenAt: iso(item.last_seen_at) } : {})
+    });
+  }
   return keys.map((row) => ({
     id: row.id, key: row.key_hint || row.license_key, productId: row.product_id, status: row.status,
     maxActivations: Number(row.max_activations), createdBy: row.created_by,
     redeemedByUserId: row.redeemed_by_user_id || null,
     notes: row.notes || '', createdAt: iso(row.created_at), updatedAt: iso(row.updated_at), expiresAt: iso(row.expires_at),
-    activations: activations.filter((item) => item.license_id === row.id).map((item) => ({
-      hwidHash: item.hwid_hash, activationIp: item.activation_ip || null, activatedAt: iso(item.activated_at),
-      ...(item.last_seen_at ? { lastSeenAt: iso(item.last_seen_at) } : {})
-    }))
+    activations: byLicense.get(row.id) || []
   }));
 }
 
 async function getAdminOverview() {
   await ensureDatabase();
-  const [{ data: users, error }, keys, status, auditLogs] = await Promise.all([
-    getClient().from('kf_users').select('id,username,role,created_at').order('created_at'),
-    getAllKeys(), getDatabaseStatus(), getAuditLogs({ limit: 30 })
+  // ANTES: getAllKeys() sem limite + 8 counts exact em paralelo = timeout certo.
+  // AGORA: preview paginado (100 keys) + counts estimated + users limitados.
+  const db = getClient();
+  const [{ data: users, error }, keysPage, status, auditLogs] = await Promise.all([
+    db.from('kf_users').select('id,username,role,created_at').order('created_at').limit(500),
+    listKeysPage({ page: 1, pageSize: 100 }),
+    getDatabaseStatus(), getAuditLogs({ limit: 30 })
   ]);
   fail(error);
   return {
     status,
     users: users.map((row) => ({ id: row.id, username: row.username, role: row.role, createdAt: iso(row.created_at) })),
-    keys: keys.map((row) => ({ ...row, activationCount: row.activations.length })),
+    keys: keysPage.items.map((row) => ({ ...row, activationCount: row.activations.length })),
+    keysPagination: { total: keysPage.total, page: 1, pageSize: 100, totalPages: keysPage.totalPages },
     auditLogs
   };
 }
@@ -203,7 +239,10 @@ async function listKeysPage({ page = 1, pageSize = 25, search = '', status = 'al
   const safePage = Math.max(1, Number(page) || 1);
   const safeSize = Math.min(100, Math.max(1, Number(pageSize) || 25));
   const allowedSort = new Set(['created_at', 'expires_at', 'status', 'product_id']);
-  let query = getClient().from('kf_license_keys').select('*', { count: 'exact' });
+  // count:'estimated' evita SEQ SCAN do count exact (causa #1 de statement timeout).
+  // Para totais exatos em tabelas pequenas o valor estimado coincide; em tabelas
+  // grandes o painel mostra aproximacao sem derrubar o banco.
+  let query = getClient().from('kf_license_keys').select('*', { count: 'estimated' });
   if (search) query = query.or(`key_hint.ilike.%${String(search).replace(/[%(),]/g, '')}%,product_id.ilike.%${String(search).replace(/[%(),]/g, '')}%`);
   if (status === 'expired') query = query.lt('expires_at', new Date().toISOString());
   else if (status !== 'all') query = query.eq('status', status);
@@ -351,10 +390,19 @@ async function findSessionUser(tokenHash) {
   return user ? { id: user.id, username: user.username, role: user.role, createdAt: iso(user.created_at) } : null;
 }
 
+let lastSessionCleanup = 0;
 async function insertSession({ id, userId, tokenHash, expiresAt }) {
   await ensureDatabase();
   const db = getClient();
-  await db.from('kf_sessions').delete().lte('expires_at', new Date().toISOString());
+  // ANTES: DELETE de sessoes expiradas a CADA login — trava a tabela e soma
+  // carga concorrente (contribui p/ statement timeout em horario de pico).
+  // AGORA: limpeza no maximo 1x a cada 10 min; delete nunca bloqueia o login.
+  if (Date.now() - lastSessionCleanup > 10 * 60 * 1000) {
+    lastSessionCleanup = Date.now();
+    db.from('kf_sessions').delete().lte('expires_at', new Date().toISOString())
+      .then(({ error }) => { if (error) console.error('[Supabase] Limpeza de sessoes:', error.message); })
+      .catch((error) => console.error('[Supabase] Limpeza de sessoes:', error.message));
+  }
   const { error } = await db.from('kf_sessions').insert({ id, user_id: userId, token_hash: tokenHash, expires_at: expiresAt });
   fail(error);
 }
