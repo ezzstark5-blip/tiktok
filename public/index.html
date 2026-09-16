@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#070914" />
+    <title>KeyForge — Painel de Licencas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="noise"></div>
+    <div class="orb orb-one"></div>
+    <div class="orb orb-two"></div>
+
+    <main>
+      <section id="login-view" class="login-shell">
+        <div class="brand-panel">
+          <div class="logo"><span>K</span> KeyForge</div>
+          <div class="hero-copy">
+            <p class="eyebrow">LICENSING, SIMPLIFIED</p>
+            <h1>Controle suas keys.<br /><em>Domine seu produto.</em></h1>
+            <p class="subtitle">Gerencie produtos, emissoes e ativacoes em uma experiencia rapida e segura.</p>
+            <div class="stats">
+              <div><strong>JSON</strong><span>Persistencia local</span></div>
+              <div><strong>REST</strong><span>Pronto para C++</span></div>
+              <div><strong>24/7</strong><span>Bot integrado</span></div>
+            </div>
+          </div>
+          <div class="signal-card">
+            <span class="pulse"></span>
+            <div><strong>Sistema operacional</strong><small>API aguardando conexoes</small></div>
+          </div>
+        </div>
+
+        <div class="login-panel">
+          <form id="login-form" class="login-card">
+            <p class="eyebrow">AREA RESTRITA</p>
+            <h2>Bem-vindo de volta</h2>
+            <p class="muted">Entre para acessar o painel administrativo.</p>
+            <label>Usuario<input id="username" autocomplete="username" value="1" required /></label>
+            <label>Senha<div class="password-field"><input id="password" type="password" autocomplete="current-password" value="1" required /><button id="show-password" type="button" aria-label="Mostrar senha">◉</button></div></label>
+            <p id="login-error" class="error" role="alert"></p>
+            <button class="primary" type="submit"><span>Entrar no painel</span><b>→</b></button>
+            <small class="credentials">Acesso inicial: usuario <code>1</code> e senha <code>1</code></small>
+          </form>
+        </div>
+      </section>
+
+      <section id="dashboard-view" class="dashboard hidden">
+        <aside>
+          <div class="logo"><span>K</span> KeyForge</div>
+          <nav>
+            <button class="nav-item active" data-target="overview">⌁ <span>Visao geral</span></button>
+            <button class="nav-item" data-target="products">◇ <span>Produtos</span></button>
+            <button class="nav-item" data-target="licenses">⌘ <span>Licencas</span></button>
+            <button class="nav-item" data-target="database">▦ <span>Database</span></button>
+          </nav>
+          <button id="logout" class="logout">↗ <span>Sair</span></button>
+        </aside>
+
+        <div class="content">
+          <header>
+            <div><p class="eyebrow">PAINEL ADMINISTRATIVO</p><h2 id="page-title">Visao geral</h2></div>
+            <div class="avatar">A</div>
+          </header>
+
+          <section id="overview" class="page active-page">
+            <div class="metric-grid">
+              <article><span>Keys emitidas</span><strong id="total-keys">0</strong><small>Total acumulado</small></article>
+              <article><span>Keys ativas</span><strong id="active-keys">0</strong><small>Licencas validas</small></article>
+              <article><span>Ativacoes</span><strong id="total-activations">0</strong><small>Dispositivos conectados</small></article>
+              <article class="accent-card"><span>Produtos</span><strong id="total-products">0</strong><small>Disponiveis agora</small></article>
+            </div>
+            <div class="split-grid">
+              <article class="panel generate-panel">
+                <div class="panel-head"><div><p class="eyebrow">EMISSAO RAPIDA</p><h3>Gerar nova key</h3></div><span class="icon-chip">＋</span></div>
+                <form id="key-form">
+                  <label>Produto<select id="key-product" required></select></label>
+                  <div class="form-row">
+                    <label>Validade (dias)<input id="key-days" type="number" min="1" max="3650" value="30" required /></label>
+                    <label>Dispositivos<input id="key-activations" type="number" min="1" max="100" value="1" required /></label>
+                  </div>
+                  <button class="primary" type="submit"><span>Gerar key segura</span><b>→</b></button>
+                </form>
+                <div id="generated-key" class="generated hidden"><small>KEY CRIADA</small><code></code><button type="button">Copiar</button></div>
+              </article>
+              <article class="panel">
+                <div class="panel-head"><div><p class="eyebrow">ULTIMAS EMISSOES</p><h3>Atividade recente</h3></div><button class="text-button" data-go="licenses">Ver todas</button></div>
+                <div id="recent-list" class="activity-list"></div>
+              </article>
+            </div>
+          </section>
+
+          <section id="products" class="page">
+            <div class="section-copy"><p class="eyebrow">CATALOGO</p><h3>Produtos disponiveis</h3><p class="muted">Use o ID do produto para validar uma key no cliente C++.</p></div>
+            <div id="product-grid" class="product-grid"></div>
+          </section>
+
+          <section id="licenses" class="page">
+            <div class="section-copy"><p class="eyebrow">GERENCIAMENTO</p><h3>Todas as licencas</h3><p class="muted">Ative, bloqueie e acompanhe as keys emitidas.</p></div>
+            <div class="table-wrap"><table><thead><tr><th>Key</th><th>Produto</th><th>Status</th><th>Ativacoes</th><th>Expira</th><th></th></tr></thead><tbody id="keys-table"></tbody></table></div>
+          </section>
+
+          <section id="database" class="page">
+            <div class="section-copy"><p class="eyebrow">SUPABASE POSTGRES</p><h3>Database</h3><p class="muted">Monitore as tabelas, consulte usuarios e gerencie acessos ao painel.</p></div>
+            <div class="database-status panel">
+              <div><span class="db-indicator"></span><div><strong id="db-status-label">Verificando...</strong><small id="db-host">Supabase</small></div></div>
+              <div><small>LATENCIA</small><strong id="db-latency">-- ms</strong></div>
+              <div><small>DATABASE</small><strong id="db-name">defaultdb</strong></div>
+              <div><small>CONEXAO</small><strong id="db-ssl">SSL</strong></div>
+            </div>
+            <div id="db-table-grid" class="db-table-grid"></div>
+            <div class="split-grid database-grid">
+              <article class="panel">
+                <div class="panel-head"><div><p class="eyebrow">NOVO ACESSO</p><h3>Criar usuario</h3></div><span class="icon-chip">＋</span></div>
+                <form id="user-form">
+                  <label>Usuario<input id="new-username" minlength="3" maxlength="50" placeholder="nome.usuario" required /></label>
+                  <label>Senha<input id="new-password" type="password" minlength="6" maxlength="128" placeholder="Minimo de 6 caracteres" required /></label>
+                  <label>Permissao<select id="new-role"><option value="admin">Administrador</option><option value="operator">Operador</option></select></label>
+                  <button class="primary" type="submit"><span>Criar usuario</span><b>→</b></button>
+                </form>
+              </article>
+              <article class="panel">
+                <div class="panel-head"><div><p class="eyebrow">ACESSOS</p><h3>Usuarios cadastrados</h3></div></div>
+                <div class="table-wrap compact-table"><table><thead><tr><th>Usuario</th><th>Permissao</th><th>Criado</th></tr></thead><tbody id="users-table"></tbody></table></div>
+              </article>
+            </div>
+            <div class="section-copy db-keys-title"><p class="eyebrow">TABELA DE LICENCAS</p><h3>Keys armazenadas</h3></div>
+            <div class="table-wrap"><table><thead><tr><th>Key</th><th>Produto</th><th>Status</th><th>Ativacoes</th><th>Criada</th><th>Expira</th></tr></thead><tbody id="db-keys-table"></tbody></table></div>
+          </section>
+        </div>
+      </section>
+    </main>
+    <div id="toast" class="toast"></div>
+    <script src="/app.js" defer></script>
+  </body>
+</html>
