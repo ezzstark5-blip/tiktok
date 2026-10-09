@@ -45,9 +45,20 @@ export function resultMessage(row,profile=null) {
   }
   const detection=r.detection;
   if(detection && detection.status!=='not_reported') {
-    const counts=Object.fromEntries(['exact','review','context'].map(level=>[level,detection.findings.filter(f=>f.level===level).length]));
-    container.addSeparatorComponents(new SeparatorBuilder()).addTextDisplayComponents(text(`### Indícios · ${detection.status==='partial'?'cobertura parcial':'coleta concluída'}\nHashes fornecidos: **${counts.exact}** · Revisar: **${counts.review}** · Contexto: **${counts.context}**\nArquivos: ${detection.filesChecked} · Eventos: ${detection.eventsChecked}`));
-    for(const finding of detection.findings.slice(0,3)) container.addTextDisplayComponents(text(`**${safe(finding.rule)}** (${safe(finding.level)})\n${safe(finding.evidence)}`));
+    const findings=Array.isArray(detection.findings)?detection.findings:[];
+    const counts=Object.fromEntries(['exact','review','context'].map(level=>[level,findings.filter(f=>f.level===level).length]));
+    const severity={exact:{dot:'🔴',label:'ALTO · hash correspondente',color:0xed4245},review:{dot:'🟡',label:'MÉDIO · revisar',color:0xfee75c},context:{dot:'🔵',label:'INFORMATIVO · contexto',color:0x3498db}};
+    const strongest=counts.exact?'exact':counts.review?'review':counts.context?'context':null;
+    if(strongest) container.setAccentColor(severity[strongest].color);
+    const coverage=detection.status==='partial'?'cobertura parcial':detection.status==='completed'?'coleta concluída':'status da coleta: '+safe(detection.status);
+    container.addSeparatorComponents(new SeparatorBuilder()).addTextDisplayComponents(text(`### Resultado das detecções · ${coverage}\n🔴 **Alto:** ${counts.exact} · 🟡 **Médio:** ${counts.review} · 🔵 **Informativo:** ${counts.context}\nArquivos analisados: ${detection.filesChecked??0} · Eventos analisados: ${detection.eventsChecked??0}`));
+    const order={exact:0,review:1,context:2};
+    const highlights=[...findings].sort((a,b)=>(order[a.level]??3)-(order[b.level]??3)).slice(0,3);
+    for(const finding of highlights) {
+      const level=severity[finding.level]||{dot:'⚪',label:'NÃO CLASSIFICADO'};
+      container.addTextDisplayComponents(text(`${level.dot} **${level.label}**\n**${safe(finding.rule)}**\n${safe(finding.evidence)}`));
+    }
+    container.addTextDisplayComponents(text('-# Alto indica correspondência com hash conhecido. Médio exige revisão manual; informativo é contexto. Estes sinais não confirmam, sozinhos, que um arquivo seja cheat.'));
     container.addFileComponents(new FileBuilder().setURL('attachment://detection-report.json'));
     message.files=[...(message.files||[]),new AttachmentBuilder(Buffer.from(JSON.stringify(detection,null,2),'utf8'),{name:'detection-report.json'})];
   }
