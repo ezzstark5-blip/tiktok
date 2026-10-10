@@ -6,7 +6,7 @@ export function config() {
     guildId: process.env.DISCORD_GUILD_ID ?? '',
     channelId: process.env.RESULT_CHANNEL_ID ?? '',
     roleId: process.env.STAFF_ROLE_ID ?? '',
-    ttl: num(process.env.PIN_TTL_MINUTES, 15) * 60_000,
+    ttl: num(process.env.PIN_TTL_MINUTES, 60) * 60_000,
     host: process.env.HOST ?? '0.0.0.0',
     port: num(process.env.PORT, 3000),
     dataFile: process.env.DATA_FILE ?? './data/db.json',
