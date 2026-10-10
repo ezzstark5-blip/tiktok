@@ -43,18 +43,19 @@ export function createApi(store) {
         return row ? reply(200, { token: row.token }) : reply(403, { error: 'PIN inválido, expirado ou já utilizado.' });
       }
       const token = req.headers.authorization?.match(/^Bearer ([a-f0-9]{64})$/)?.[1];
-      if (!token) return reply(401, { error: 'Sessão inválida.' });
-      if (!Number.isInteger(body.matches) || body.matches < 0 || body.matches > 10000 || typeof body.fiveMDetected !== 'boolean' || typeof body.failed !== 'boolean' || (body.failed && body.matches !== 0)) return reply(400, { error: 'Resultado inválido.' });
+      if (!token) { console.log('resultado: sem token'); return reply(401, { error: 'Sessão inválida.' }); }
+      if (!Number.isInteger(body.matches) || body.matches < 0 || body.matches > 10000 || typeof body.fiveMDetected !== 'boolean' || typeof body.failed !== 'boolean' || (body.failed && body.matches !== 0)) { console.log('resultado: corpo inválido'); return reply(400, { error: 'Resultado inválido.' }); }
       let embeds = null, log = null;
       if (body.embeds !== undefined) {
-        if (!Array.isArray(body.embeds) || body.embeds.length === 0 || body.embeds.length > 10 || !body.embeds.every(validEmbed)) return reply(400, { error: 'Embeds inválidas.' });
+        if (!Array.isArray(body.embeds) || body.embeds.length === 0 || body.embeds.length > 10 || !body.embeds.every(validEmbed)) { console.log(`resultado: embeds inválidas (n=${Array.isArray(body.embeds) ? body.embeds.length : '?'})`); return reply(400, { error: 'Embeds inválidas.' }); }
         embeds = body.embeds;
       }
       if (body.log !== undefined) {
-        if (!Array.isArray(body.log) || body.log.length === 0 || body.log.length > 12 || !body.log.every((m) => typeof m === 'string' && m.length > 0 && m.length <= 1900)) return reply(400, { error: 'Log inválido.' });
+        if (!Array.isArray(body.log) || body.log.length === 0 || body.log.length > 12 || !body.log.every((m) => typeof m === 'string' && m.length > 0 && m.length <= 1900)) { console.log('resultado: log inválido'); return reply(400, { error: 'Log inválido.' }); }
         log = body.log;
       }
       const row = await store.submit(token, { matches: body.matches, fiveMDetected: body.fiveMDetected, failed: body.failed, embeds, log });
+      if (!row) { console.log('resultado: token desconhecido'); return reply(403, { error: 'Sessão inválida ou expirada.' }); }
       if(row) console.log(`resultado recebido pin=${row.pin} matches=${body.matches}`);
       return row ? reply(200, { ok: true, queued: !row.delivered }) : reply(403, { error: 'Sessão inválida ou expirada.' });
     } catch (error) {
